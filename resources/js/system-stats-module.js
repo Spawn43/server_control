@@ -1,28 +1,44 @@
 const fs = require("fs");
 const {exec} = require("child_process");
 const filePath='resources/text/sys_info.txt';
-
+const filePath_1='resources/text/sys_info_1.txt';
+const {
+    setIntervalAsync,
+    clearIntervalAsync
+} = require('set-interval-async/dynamic')
 /*
     Exports
  */
 module.exports.sysinfo = get_sysinfo;
-module.exports.read = read_fromfile;
-module.exports.write = write_tofile;
-module.exports.update = update_resources;
 
+const server_information = [];
 
 /*
     API FUNCTIONS
  */
-function get_sysinfo(count,server_information){
+function get_sysinfo(count){
     var i = server_information.length-1;
     const return_array=[];
     console.log(count);
     console.log(i);
     console.log(server_information.length-1);
+    let backup = [];
+    var backup_i =0 ;
+    if(count>server_information.length){
+        backup = legacy_data()
+        backup_i = backup.length-1;
+    }
+
     while(0<count){
-        return_array.push(server_information[i]);
-        i--;
+        if(server_information[i]===undefined){
+            return_array.push(backup[backup_i]);
+            backup_i--;
+        }
+        else{
+            return_array.push(server_information[i]);
+            i--;
+
+        }
         count--;
     }
     console.log(return_array);
@@ -30,30 +46,38 @@ function get_sysinfo(count,server_information){
     return return_array;
 }
 
-function read_fromfile(){
-    const return_array = []
-    const data = fs.readFileSync(filePath,'utf8');
-    data_array = data.split("},");
 
-    var i=0;
 
-    while(i<data_array.length-1){
-        return_array.push(data_array[i]+"}");
 
-        i++;
+
+
+
+/*
+    INTERNAL FUNCTIONS
+ */
+
+setIntervalAsync(()=>{console.log("running");update_resources()},5000);
+setIntervalAsync(()=>{console.log("running2");write_tofile()},60000);
+
+function write_tofile(){
+    const store_array = [];
+    while(server_information.length>17280){
+
+        store_array.push(server_information.shift());
     }
 
-    return return_array;
+    if(store_array.length>0){
+        fs.appendFile(filePath_1,store_array,err => {
+            if (err) {
+                console.error(err)
+            }
+        })
+    }
 
-}
-
-function write_tofile(Info){
-    fs.writeFile(filePath, Info, err => {
+    fs.writeFile(filePath, server_information, err => {
         if (err) {
             console.error(err)
-
         }
-
     });
 }
 
@@ -71,15 +95,31 @@ function update_resources(){
         return_json = get_json(parsed_bash);
 
         console.log(return_json);
-        return return_json;
+        server_information.push(return_json);
     });
 
 }
 
-/*
-    INTERNAL FUNCTIONS
- */
 
+const data = fs.readFileSync(filePath,'utf8');
+data_array = data.split("},");
+var i=0;
+while(i<data_array.length-1) {
+    server_information.push(data_array[i] + "}");
+    i++;
+}
+
+function legacy_data(){
+    const data = fs.readFileSync(filePath_1,'utf8');
+    const return_array=[]
+    data_array = data.split("},");
+    var i=0;
+    while(i<data_array.length-1) {
+        return_array.push(data_array[i] + "}");
+        i++;
+    }
+    return return_array;
+}
 
 function parse_bash(data){
     bash_array=  data.slice(0, data.indexOf("\n")).split(",");

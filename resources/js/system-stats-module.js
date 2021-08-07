@@ -3,8 +3,7 @@ const {exec} = require("child_process");
 const filePath='resources/text/sys_info.txt';
 const filePath_1='resources/text/sys_info_1.txt';
 const {
-    setIntervalAsync,
-    clearIntervalAsync
+    setIntervalAsync
 } = require('set-interval-async/dynamic')
 /*
     Exports
@@ -56,8 +55,8 @@ function get_sysinfo(count){
     INTERNAL FUNCTIONS
  */
 
-setIntervalAsync(()=>{console.log("running");update_resources()},5000);
-setIntervalAsync(()=>{console.log("running2");write_tofile()},60000);
+setIntervalAsync(()=>{update_resources()},5000);
+setIntervalAsync(()=>{write_tofile()},60000);
 
 function write_tofile(){
     const store_array = [];

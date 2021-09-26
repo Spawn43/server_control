@@ -1,7 +1,7 @@
 const fs = require("fs");
 const {exec} = require("child_process");
-const filePath='resources/text/sys_info.txt';
-const filePath_1='resources/text/sys_info_1.txt';
+const filePath='logs/sys_info.log';
+const filePath_1='logs/sys_info.log.1';
 const {
     setIntervalAsync
 } = require('set-interval-async/dynamic')
@@ -40,8 +40,8 @@ function get_sysinfo(count){
         }
         count--;
     }
-    console.log(return_array);
-    console.log(return_array.length);
+    // console.log(return_array);
+    // console.log(return_array.length);
     return return_array;
 }
 
@@ -81,7 +81,7 @@ function write_tofile(){
 }
 
 function update_resources(){
-    exec("sh resources/bash/get_resource.sh", (error, stdout, stderr) => {
+    exec("sh services/bash/get_resource.sh", (error, stdout, stderr) => {
         if (error) {
             console.log(`error: ${error.message}`);
             return;
@@ -93,7 +93,7 @@ function update_resources(){
         parsed_bash = parse_bash(stdout);
         return_json = get_json(parsed_bash);
 
-        console.log(return_json);
+        // console.log(return_json);
         server_information.push(return_json);
     });
 

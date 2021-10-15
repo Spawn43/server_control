@@ -7,6 +7,7 @@ const bodyParser = require('body-parser');
 const sys = require('./services/system_stats_service');
 const minecraft = require('./services/minecraft_service');
 const valheim = require('./services/valheim_service');
+const factorio = require('./services/factorio_service');
 const app = express();
 app.use(bodyParser.json({ extended: true }));
 /*
@@ -57,6 +58,33 @@ app.post('/valheim',(req, res) =>{
      else{
          res.sendStatus(401)
      }
+});
+
+
+app.post('/factorio',(req, res) =>{
+    let requestbody = req.body;
+    console.debug('request ',req.body);
+    if(requestbody["apikey"]==='zainisafatneek'){
+        switch (requestbody["request"]){
+            case "start":
+                factorio.run();
+                res.sendStatus(200);
+                break;
+            case "stop":
+                factorio.stop();
+                res.sendStatus(200);
+                break;
+            case "status":
+                let factorio_status = factorio.status();
+                res.send(factorio_status);
+                break;
+            default:
+                res.sendStatus(405);
+        }
+    }
+    else{
+        res.sendStatus(401)
+    }
 });
 
 
